@@ -1,0 +1,123 @@
+include "target.tmh"
+
+char shiftMode = 0;
+
+int main()
+{
+	Configure(&HCougar, MODE_EXCLUDED);
+	Configure(&Joystick, MODE_EXCLUDED);
+	Configure(&JoystickF18, MODE_EXCLUDED);
+	Configure(&Throttle, MODE_EXCLUDED);
+	Configure(&A320Pilot, MODE_EXCLUDED);
+	Configure(&A320Copilot, MODE_EXCLUDED);
+	Configure(&TCAQuadrant12, MODE_EXCLUDED);
+	Configure(&TCAQuadrant34, MODE_EXCLUDED);
+	Configure(&LMFD, MODE_EXCLUDED);
+	Configure(&RMFD, MODE_EXCLUDED);
+	Configure(&TFRPRudder, MODE_EXCLUDED);
+	Configure(&TWCSThrottle, MODE_EXCLUDED);
+	Configure(&TFRPHARudder, MODE_EXCLUDED);
+	if(Init(&EventHandle)) return 1;
+	SetKBRate(50, 50);
+	SetKBLayout(KB_FR);
+	
+	/* Right */
+	MapKey(&T16000, TS1, DX9);
+	MapKey(&T16000, TS2, DX11);
+	MapKey(&T16000, TS3, DX12);
+	MapKey(&T16000, TS4, DX10);
+	MapKey(&T16000, B5, USB[0x30]); // refuse
+	MapKey(&T16000, B6, PULSE+F4);
+	MapKey(&T16000, B7, PULSE+DX25);
+	MapKey(&T16000, B8, PULSE+ F2); // star map
+	MapKey(&T16000, B9, PULSE+ F1); // mobiglass
+	MapKey(&T16000, B10, USB[0x2F]);// accept
+	MapKey(&T16000, B11, DX24);
+	MapKey(&T16000, B12, DX27);
+	MapKey(&T16000, B13, DX28);
+	MapKey(&T16000, B14, PULSE+L_CTL+'w'); // zero openTrack
+	MapKey(&T16000, B15, USB[0x54]); // L_CTL+L_ALT+'w'); // stop OpenTrack tracking 
+	MapKey(&T16000, B16, PULSE+DX5);
+	MapKey(&T16000, H1U, DX13);
+	MapKey(&T16000, H1R, DX14);
+	MapKey(&T16000, H1D, DX15);
+	MapKey(&T16000, H1L, DX16);
+	KeyAxis(&T16000, THR, 0, AXMAP2( LIST( 0 ), 0 ));
+	MapAxis(&T16000, JOYX, DX_X_AXIS, AXIS_NORMAL, MAP_ABSOLUTE);
+	SetSCurve(&T16000, JOYX, 2, 2, 2, 3, 0);
+	MapAxis(&T16000, JOYY, DX_Y_AXIS, AXIS_NORMAL, MAP_ABSOLUTE);
+	SetSCurve(&T16000, JOYY, 2, 2, 2, 3, 0);
+	MapAxis(&T16000, RUDDER, DX_Z_AXIS, AXIS_NORMAL, MAP_ABSOLUTE);
+	SetSCurve(&T16000, RUDDER, 2, 2, 2, 3, 0);
+	MapAxis(&T16000, THR, DX_SLIDER_AXIS, AXIS_REVERSED, MAP_ABSOLUTE);
+	SetSCurve(&T16000, THR, 0, 0, 0, 5, 0);
+	
+	/* Left */
+	
+	/* shift mode management */
+	MapKey(&T16000L, TS1, CHAIN(
+        EXEC("shiftMode=1;"), 
+        EXEC("ActKey(KEYON+L_ALT);"))
+    );
+	MapKeyR(&T16000L, TS1, CHAIN(
+        EXEC("shiftMode=0;"),
+        EXEC("ActKey(L_ALT);"))
+	 );
+	
+	MapKey(&T16000L, TS2, DX7);
+	MapKey(&T16000L, TS3, DX8);
+	MapKey(&T16000L, TS4, DX6);
+	MapKey(&T16000L, B5, PULSE+DX19);
+	MapKey(&T16000L, B6, PULSE+DX18);
+	MapKey(&T16000L, B7, PULSE+DX17);
+	MapKey(&T16000L, B8, PULSE+DX20);
+	MapKey(&T16000L, B9, PULSE+DX21);
+	MapKey(&T16000L, B10, PULSE+DX22);
+	MapKey(&T16000L, B11, PULSE+DX29);
+	MapKey(&T16000L, B12, DX23);
+	MapKey(&T16000L, B13, PULSE+DX30);
+	MapKey(&T16000L, B14, DX32);
+	MapKey(&T16000L, B15, DX26);
+	MapKey(&T16000L, B16, DX31);
+	MapKey(&T16000L, H1U, DX1);
+    MapKey(&T16000L, H1D, DX3);
+    
+    /* 
+     - If in shift mode (power management), send immediate command.
+     - If not, then wait 500ms before sending the event (chaff/flare) to avoid 
+       chaff/flare when changing speed limit using H1U and H1D buttons and hit left/right
+       by mistake (ie, debounce right/left hat)
+    */
+    // right hat
+//    MapKey(&T16000L, H1R, TEMPO(
+//	   EXEC("if(shiftMode) ActKey(KEYON+DX2);"),
+//	   EXEC("if(!shiftMode) ActKey(PULSE+KEYON+DX2);"),
+//	   500)
+//	);
+	MapKey(&T16000L, H1R, EXEC("ActKey(KEYON+DX2);"));
+	MapKeyR(&T16000L, H1R, EXEC("ActKey(DX2);"));
+	 
+	// left hat
+   // MapKey(&T16000L, H1L, TEMPO(
+//   EXEC("if(shiftMode) ActKey(KEYON+DX4);"),
+//	   EXEC("if(!shiftMode) ActKey(PULSE+KEYON+DX4);"),
+//	   500)
+//	);
+	MapKey(&T16000L, H1L, EXEC("ActKey(KEYON+DX4);"));
+    MapKeyR(&T16000L, H1L, EXEC("ActKey(DX4);"));
+	 
+	KeyAxis(&T16000L, THR, 0, AXMAP2( LIST( 0 ), 0 ));
+	MapAxis(&T16000L, JOYX, DX_XROT_AXIS, AXIS_NORMAL, MAP_ABSOLUTE);
+	SetSCurve(&T16000L, JOYX, 2, 2, 2, 3, 0);
+	MapAxis(&T16000L, JOYY, DX_YROT_AXIS, AXIS_NORMAL, MAP_ABSOLUTE);
+	SetSCurve(&T16000L, JOYY, 2, 2, 2, 3, 0);
+	MapAxis(&T16000L, RUDDER, DX_ZROT_AXIS, AXIS_NORMAL, MAP_ABSOLUTE);
+	SetSCurve(&T16000L, RUDDER, 2, 2, 2, 3, 0);
+	MapAxis(&T16000L, THR, DX_THROTTLE_AXIS, AXIS_REVERSED, MAP_ABSOLUTE);
+	SetSCurve(&T16000L, THR, 0, 0, 0, 5, 0);
+
+}
+int EventHandle(int type, alias o, int x)
+{
+	DefaultMapping(&o, x);
+}
