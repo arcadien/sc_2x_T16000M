@@ -17,6 +17,9 @@ int main()
 	Configure(&TFRPRudder, MODE_EXCLUDED);
 	Configure(&TWCSThrottle, MODE_EXCLUDED);
 	Configure(&TFRPHARudder, MODE_EXCLUDED);
+	Configure(&TCAQBoeing12, MODE_EXCLUDED);
+	Configure(&TCAQBoeing34, MODE_EXCLUDED);
+	Configure(&TCAYokeBoeing, MODE_EXCLUDED);
 	if(Init(&EventHandle)) return 1;
 	SetKBRate(50, 50);
 	SetKBLayout(KB_FR);
@@ -43,12 +46,16 @@ int main()
 	MapKey(&T16000, H1D, DX15);
 	MapKey(&T16000, H1L, DX16);
 	KeyAxis(&T16000, THR, 0, AXMAP2( LIST( 0 ), 0 ));
+	
 	MapAxis(&T16000, JOYX, DX_X_AXIS, AXIS_NORMAL, MAP_ABSOLUTE);
 	SetSCurve(&T16000, JOYX, 2, 2, 2, 3, 0);
+	
 	MapAxis(&T16000, JOYY, DX_Y_AXIS, AXIS_NORMAL, MAP_ABSOLUTE);
 	SetSCurve(&T16000, JOYY, 2, 2, 2, 3, 0);
+	
 	MapAxis(&T16000, RUDDER, DX_Z_AXIS, AXIS_NORMAL, MAP_ABSOLUTE);
-	SetSCurve(&T16000, RUDDER, 2, 2, 2, 3, 0);
+	SetSCurve(&T16000, RUDDER, 2, 2, 2, 5, -1);
+	
 	MapAxis(&T16000, THR, DX_SLIDER_AXIS, AXIS_REVERSED, MAP_ABSOLUTE);
 	SetSCurve(&T16000, THR, 0, 0, 0, 5, 0);
 	
@@ -77,7 +84,7 @@ int main()
 	MapKey(&T16000L, B12, DX23);
 	MapKey(&T16000L, B13, PULSE+DX30);
 	MapKey(&T16000L, B14, DX32);
-	MapKey(&T16000L, B15, DX26);
+	MapKey(&T16000L, B15, 'f' /* DX26 */);
 	MapKey(&T16000L, B16, DX31);
 	MapKey(&T16000L, H1U, DX1);
     MapKey(&T16000L, H1D, DX3);
@@ -89,30 +96,34 @@ int main()
        by mistake (ie, debounce right/left hat)
     */
     // right hat
-//    MapKey(&T16000L, H1R, TEMPO(
-//	   EXEC("if(shiftMode) ActKey(KEYON+DX2);"),
-//	   EXEC("if(!shiftMode) ActKey(PULSE+KEYON+DX2);"),
-//	   500)
-//	);
+    MapKey(&T16000L, H1R, TEMPO(
+	   EXEC("if(shiftMode) ActKey(KEYON+DX2);"),
+	   EXEC("if(!shiftMode) ActKey(PULSE+KEYON+DX2);"),
+	   50)
+	);
 	MapKey(&T16000L, H1R, EXEC("ActKey(KEYON+DX2);"));
 	MapKeyR(&T16000L, H1R, EXEC("ActKey(DX2);"));
 	 
 	// left hat
-   // MapKey(&T16000L, H1L, TEMPO(
-//   EXEC("if(shiftMode) ActKey(KEYON+DX4);"),
-//	   EXEC("if(!shiftMode) ActKey(PULSE+KEYON+DX4);"),
-//	   500)
-//	);
+   	MapKey(&T16000L, H1L, TEMPO(
+		EXEC("if(shiftMode) ActKey(KEYON+DX4);"),
+		EXEC("if(!shiftMode) ActKey(PULSE+KEYON+DX4);"),
+	   	50)
+	);
 	MapKey(&T16000L, H1L, EXEC("ActKey(KEYON+DX4);"));
     MapKeyR(&T16000L, H1L, EXEC("ActKey(DX4);"));
 	 
 	KeyAxis(&T16000L, THR, 0, AXMAP2( LIST( 0 ), 0 ));
+	
 	MapAxis(&T16000L, JOYX, DX_XROT_AXIS, AXIS_NORMAL, MAP_ABSOLUTE);
 	SetSCurve(&T16000L, JOYX, 2, 2, 2, 3, 0);
+	
 	MapAxis(&T16000L, JOYY, DX_YROT_AXIS, AXIS_NORMAL, MAP_ABSOLUTE);
 	SetSCurve(&T16000L, JOYY, 2, 2, 2, 3, 0);
+	
 	MapAxis(&T16000L, RUDDER, DX_ZROT_AXIS, AXIS_NORMAL, MAP_ABSOLUTE);
 	SetSCurve(&T16000L, RUDDER, 2, 2, 2, 3, 0);
+	
 	MapAxis(&T16000L, THR, DX_THROTTLE_AXIS, AXIS_REVERSED, MAP_ABSOLUTE);
 	SetSCurve(&T16000L, THR, 0, 0, 0, 5, 0);
 
